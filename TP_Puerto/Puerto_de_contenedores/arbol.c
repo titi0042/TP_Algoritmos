@@ -117,14 +117,14 @@ void recorrerPosInv(const tArbol *arbol, tAccionRec accion, void *param) { _reco
 unsigned alturaArbol(const tArbol *arbol)
 {
     if(!*arbol) return 0;
-    return MAX(alturaArbol((const tArbol*)&(*arbol)->izq), alturaArbol((const tArbol*)&(*arbol)->der)) + 1;
+    return MAXIMO(alturaArbol((const tArbol*)&(*arbol)->izq), alturaArbol((const tArbol*)&(*arbol)->der)) + 1;
 }
 
 int esCompletoHastaNivelArbol(const tArbol *arbol, unsigned n)
 {
     if(!*arbol) return 0;
     if(!n) return 1;
-    return esCompletoHastaNivelArbol((const tArbol*)&(*arbol)->izq, n-1) && 
+    return esCompletoHastaNivelArbol((const tArbol*)&(*arbol)->izq, n-1) &&
            esCompletoHastaNivelArbol((const tArbol*)&(*arbol)->der, n-1);
 }
 
@@ -151,7 +151,7 @@ int esAVLArbol(const tArbol *arbol)
 unsigned cantAbuelosArbol(const tArbol* arbol)
 {
     if (!*arbol) return 0;
-    int esAbuelo = ((*arbol)->izq && ((*arbol)->izq->izq || (*arbol)->izq->der)) || 
+    int esAbuelo = ((*arbol)->izq && ((*arbol)->izq->izq || (*arbol)->izq->der)) ||
                    ((*arbol)->der && ((*arbol)->der->izq || (*arbol)->der->der)) ? 1 : 0;
 
     return esAbuelo + cantAbuelosArbol((const tArbol*)&(*arbol)->izq) + cantAbuelosArbol((const tArbol*)&(*arbol)->der);
@@ -196,7 +196,7 @@ unsigned cantNodosHastaNivel(const tArbol* arbol, unsigned nivel)
 {
     if (!*arbol) return 0;
     if(!nivel) return 1;
-    return 1 + cantNodosHastaNivel((const tArbol*)&(*arbol)->izq, nivel - 1) + 
+    return 1 + cantNodosHastaNivel((const tArbol*)&(*arbol)->izq, nivel - 1) +
                cantNodosHastaNivel((const tArbol*)&(*arbol)->der, nivel - 1);
 }
 
@@ -258,7 +258,7 @@ int busqElemArbol(const tArbol* arbol, void* destino, unsigned tamDestino, tCmp 
     tArbol* hallado = busqNodoArbol((tArbol*)arbol, destino, cmpClave);
     if (!hallado) return NO_ENCONTRADO;
 
-    memcpy(destino, (*hallado)->info, MIN(tamDestino, (*hallado)->tamInfo));
+    memcpy(destino, (*hallado)->info, MINIMO(tamDestino, (*hallado)->tamInfo));
     return EXITO;
 }
 
@@ -290,7 +290,7 @@ int busqElemMaxArbol(const tArbol *arbol, void *info, unsigned tamInfo)
     tArbol* max = busqNodoMaxArbol((tArbol*)arbol);
     if(!max) return ARBOL_VACIO;
 
-    memcpy(info, (*max)->info, MIN(tamInfo, (*max)->tamInfo));
+    memcpy(info, (*max)->info, MINIMO(tamInfo, (*max)->tamInfo));
     return EXITO;
 }
 
@@ -299,7 +299,7 @@ int busqElemMinArbol(const tArbol *arbol, void *info, unsigned tamInfo)
     tArbol* min = busqNodoMinArbol((tArbol*)arbol);
     if(!min) return ARBOL_VACIO;
 
-    memcpy(info, (*min)->info, MIN(tamInfo, (*min)->tamInfo));
+    memcpy(info, (*min)->info, MINIMO(tamInfo, (*min)->tamInfo));
     return EXITO;
 }
 /// ELIMINACIÓN Y PODAS
@@ -342,7 +342,7 @@ void eliminarArbol(tArbol* arbol)
     if (!*arbol) return;
     eliminarArbol(&(*arbol)->izq);
     eliminarArbol(&(*arbol)->der);
-    
+
     free((*arbol)->info);
     free(*arbol);
     *arbol = NULL;

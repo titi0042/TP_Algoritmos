@@ -10,7 +10,7 @@ void crearCola(tCola *p)
 
 int colaVacia(const tCola *p)
 {
-    return p->prim == NULL; // Devuelve 1 si está vacía, 0 si no
+    return p->prim == NULL;
 }
 
 int ponerEnCola(tCola *p, const void *d, unsigned cantBytes)
@@ -18,23 +18,23 @@ int ponerEnCola(tCola *p, const void *d, unsigned cantBytes)
     tNodoCola *aux = malloc(sizeof(tNodoCola));
     if(!aux)
         return SIN_MEM;
-    
+
     aux->info = malloc(cantBytes);
     if(!aux->info)
     {
         free(aux);
         return SIN_MEM;
     }
-    
+
     memcpy(aux->info, d, cantBytes);
     aux->tamInfo = cantBytes;
     aux->sig = NULL;
-    
+
     if(p->ult)
         p->ult->sig = aux;
     else
         p->prim = aux;
-        
+
     p->ult = aux;
     return EXITO;
 }
@@ -42,11 +42,11 @@ int ponerEnCola(tCola *p, const void *d, unsigned cantBytes)
 int sacarDeCola(tCola* p, void* d, unsigned cantBytes)
 {
     tNodoCola *aux = p->prim;
-    
+
     if(!aux)
         return COLA_VACIA;
-        
-    memcpy(d, aux->info, MIN(aux->tamInfo, cantBytes));
+
+    memcpy(d, aux->info, MINIMO(aux->tamInfo, cantBytes));
     p->prim = p->prim->sig;
     free(aux->info);
     free(aux);
@@ -62,8 +62,8 @@ int verPrimeroCola(const tCola* p, void* d, unsigned cantBytes)
 {
     if(!p->prim)
         return COLA_VACIA;
-        
-    memcpy(d, p->prim->info, MIN(p->prim->tamInfo, cantBytes));
+
+    memcpy(d, p->prim->info, MINIMO(p->prim->tamInfo, cantBytes));
     return EXITO;
 }
 
