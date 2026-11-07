@@ -1,4 +1,4 @@
-#include "simulacion.h"
+#include "lista.h"
 
 void crearLista(tLista* p)
 {
