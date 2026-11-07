@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "arbol_v2.h"
+#include "arbol.h"
 /// PROTOTIPOS DE FUNCIONES PRIVADAS
 void _recorrerPre(const tArbol *arbol, tAccionRec accion, void *param, unsigned nivel);
 void _recorrerIn(const tArbol *arbol, tAccionRec accion, void *param, unsigned nivel);
