@@ -22,7 +22,7 @@
 #define ERR_INSER_ABB   -9
 
 /// MACROS
-#define MIN(X,Y) ((X) > (Y) ? (Y) : (X))
-#define MAX(X,Y) ((X) > (Y) ? (X) : (Y))
+#define MINIMO(X,Y) ((X) > (Y) ? (Y) : (X))
+#define MAXIMO(X,Y) ((X) > (Y) ? (X) : (Y))
 
 #endif // COMUNES_H_INCLUDED
