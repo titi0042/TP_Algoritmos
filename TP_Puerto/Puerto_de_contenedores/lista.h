@@ -1,6 +1,6 @@
 #ifndef LISTA_H_INCLUDED
 #define LISTA_H_INCLUDED
-
+#include "comunes.h"
 typedef struct sNodoLista
 {
     void *info;
