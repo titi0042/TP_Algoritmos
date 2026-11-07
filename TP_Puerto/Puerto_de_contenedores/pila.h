@@ -1,6 +1,6 @@
 #ifndef PILA_H_INCLUDED
 #define PILA_H_INCLUDED
-
+#include "comunes.h"
 typedef struct sNodoPila
 {
     void            *info;
