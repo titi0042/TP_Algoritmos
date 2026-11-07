@@ -1,4 +1,7 @@
 #include "lista.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 void crearLista(tLista* p)
 {
@@ -69,7 +72,7 @@ int ponerEnOrden(tLista* p, const void* d, unsigned cantBytes,
         if(Acumular)
             if(!Acumular(&(*p)->info, &(*p)->tamInfo, d, cantBytes))
                 return SIN_MEM;
-        return CLA_DUP;
+        return DUPLICADO;
     }
 
     if((nuevo = malloc(sizeof(tNodoLista))) == NULL || (nuevo->info = malloc(cantBytes)) == NULL)
@@ -83,7 +86,7 @@ int ponerEnOrden(tLista* p, const void* d, unsigned cantBytes,
     nuevo->sig = *p;
     *p = nuevo;
 
-    return TODO_OK;
+    return EXITO;
 }
 
 int ponerAlComienzo(tLista* p, const void* d, unsigned cantBytes)
@@ -102,7 +105,7 @@ int ponerAlComienzo(tLista* p, const void* d, unsigned cantBytes)
     nuevo->sig = *p;
     *p = nuevo;
 
-    return TODO_OK;
+    return EXITO;
 }
 
 int ponerAlFinal(tLista* p, const void* d, unsigned cantBytes)
@@ -124,7 +127,7 @@ int ponerAlFinal(tLista* p, const void* d, unsigned cantBytes)
     nuevo->sig = NULL;
     *p = nuevo;
 
-    return TODO_OK;
+    return EXITO;
 }
 
 int sacarPrimeroLista(tLista* p, void* d, unsigned cantBytes)
@@ -132,20 +135,20 @@ int sacarPrimeroLista(tLista* p, void* d, unsigned cantBytes)
     tNodoLista* aux = *p;
 
     if(aux == NULL)
-        return SIN_MEM;
+        return LISTA_VACIA;
 
     *p = aux->sig;
     memcpy(d, aux->info, MINIMO(cantBytes, aux->tamInfo));
     free(aux->info);
     free(aux);
 
-    return TODO_OK;
+    return EXITO;
 }
 
 int sacarUltimoLista(tLista* p, void* d, unsigned cantBytes)
 {
     if(*p == NULL)
-        return 0;
+        return LISTA_VACIA;
 
     while((*p)->sig)
         p = &(*p)->sig;
@@ -155,28 +158,28 @@ int sacarUltimoLista(tLista* p, void* d, unsigned cantBytes)
     free(*p);
     *p = NULL;
 
-    return 1;
+    return EXITO;
 }
 
 int verPrimeroLista(const tLista* p, void* d, unsigned cantBytes)
 {
     if(*p == NULL)
-        return ESTRUC_VACIA;
+        return LISTA_VACIA;
     memcpy(d, (*p)->info, MINIMO(cantBytes, (*p)->tamInfo));
-    return TODO_OK;
+    return EXITO;
 }
 
 int verUltimoLista(const tLista* p, void* d, unsigned cantBytes)
 {
     if(*p == NULL)
-        return ESTRUC_VACIA;
+        return LISTA_VACIA;
 
     while((*p)->sig)
         p = &(*p)->sig;
 
     memcpy(d, (*p)->info, MINIMO(cantBytes, (*p)->tamInfo));
 
-    return TODO_OK;
+    return EXITO;
 }
 
 void ordenarLista(tLista* p, int(*Comparar)(const void*, const void*))
@@ -229,7 +232,7 @@ int mostrarListaAlReves(tLista* p, void (*Mostrar)(const void*, FILE*), FILE* fp
 
         return n + 1;
     }
-    return TODO_OK;
+    return EXITO;
 }
 
 int mostrarListaAlRevesYVaciar(tLista* p, void (*Mostrar)(const void*, FILE*), FILE* fp)
@@ -245,5 +248,5 @@ int mostrarListaAlRevesYVaciar(tLista* p, void (*Mostrar)(const void*, FILE*), F
 
         return n + 1;
     }
-    return TODO_OK;
+    return EXITO;
 }
