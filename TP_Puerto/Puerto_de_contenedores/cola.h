@@ -15,6 +15,7 @@ typedef struct
          *ult;
 }tCola;
 void crearCola(tCola *p);
+void vaciarCola(tCola *p);
 int colaVacia(tCola *p);
 int ponerEnCola(tCola *p, const void *d, unsigned tamInfo);
 int verPrimeroCola(const tCola *p, void* d, unsigned tamInfo)
