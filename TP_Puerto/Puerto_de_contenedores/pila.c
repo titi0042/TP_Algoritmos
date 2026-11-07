@@ -31,15 +31,15 @@ int ponerEnPila(tPila *p, const void *d, unsigned cantBytes)
     nuevo->sig = *p;
     *p = nuevo;
 
-    return TODO_OK;
+    return EXITO;
 }
 int verTope(const tPila *p, void *d, unsigned cantBytes)
 {
     if(*p == NULL)
-        return ESTRUC_VACIA;
+        return PILA_VACIA;
 
     memcpy(d, (*p)->info, MINIMO(cantBytes, (*p)->tamInfo));
-    return TODO_OK;
+    return EXITO;
 }
 int pilaVacia(const tPila *p)
 {
@@ -50,7 +50,7 @@ int sacarDePila(tPila *p, void *d, unsigned cantBytes)
      tNodoPila* aux = *p;
 
     if(aux == NULL)
-        return ESTRUC_VACIA;
+        return PILA_VACIA;
 
     *p = aux->sig;
 
@@ -58,7 +58,7 @@ int sacarDePila(tPila *p, void *d, unsigned cantBytes)
     free(aux->info);
     free(aux);
 
-    return TODO_OK;
+    return EXITO;
 }
 void vaciarPila(tPila *p)
 {
