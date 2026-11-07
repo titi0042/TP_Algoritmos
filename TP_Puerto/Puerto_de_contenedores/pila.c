@@ -1,4 +1,4 @@
-#include "simulacion.h"
+#include "pila.h"
 
 void crearPila(tPila *p)
 {
