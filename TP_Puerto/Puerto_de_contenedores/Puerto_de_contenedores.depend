@@ -1,9 +1,17 @@
 # depslib dependency file v1.0
-1794019947 source:c:\users\zacar\desktop\tp_algoritmps_logistica\tp_algoritmos-main\tp_puerto\puerto_de_contenedores\archivos.c
-
-1794019947 source:c:\users\zacar\desktop\tp_algoritmps_logistica\tp_algoritmos-main\tp_puerto\puerto_de_contenedores\main.c
+1794101298 source:c:\users\zacar\desktop\tp_algoritmps_logistica\tp_algoritmos-main\tp_puerto\puerto_de_contenedores\archivos.c
 	<stdio.h>
 	<stdlib.h>
+	<string.h>
+	<time.h>
+	"archivos.h"
+	"lista.h"
+
+1794101091 source:c:\users\zacar\desktop\tp_algoritmps_logistica\tp_algoritmos-main\tp_puerto\puerto_de_contenedores\main.c
+	<stdio.h>
+	<stdlib.h>
+	"comunes.h"
+	"archivos.h"
 
 1794019947 source:c:\users\zacar\desktop\tp_algoritmps_logistica\tp_algoritmos-main\tp_puerto\puerto_de_contenedores\pila.c
 	<stdlib.h>
@@ -42,5 +50,8 @@
 
 1794020257 c:\users\zacar\desktop\tp_algoritmps_logistica\tp_algoritmos-main\tp_puerto\puerto_de_contenedores\lista.h
 	<stdio.h>
+	"comunes.h"
+
+1794100278 c:\users\zacar\desktop\tp_algoritmps_logistica\tp_algoritmos-main\tp_puerto\puerto_de_contenedores\archivos.h
 	"comunes.h"
 
