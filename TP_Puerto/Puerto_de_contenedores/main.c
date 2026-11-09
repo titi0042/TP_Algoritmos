@@ -12,6 +12,7 @@ int main()
     estado = cargarConfiguracion("config.txt", &config);
     if (estado != EXITO)
     {
+        printf("no existe archivo config.txt\n");
         return ERR_ARCH;
     }
     printf("config.txt cargado exitosamente.\n");
@@ -23,5 +24,8 @@ int main()
         return ERR_ARCH;
     }
     printf("puerto.txt generado exitosamente\n");
+
+
+
     return EXITO;
 }

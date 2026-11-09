@@ -59,8 +59,6 @@ int cargarConfiguracion(const char* ruta, tConfiguracion* config)
         return ERR_ARCH;
     }
 
-
-
     ///default
     config->duracionJornadaMinutos = 30;
     config->cantidadMuelles = 1;
@@ -113,7 +111,7 @@ int generarEscenario(const char* ruta, const tConfiguracion* config)
     int i, j;
     tBuqueGen buque;
     tCamionGen camion;
-    char (*bolillero)[25];
+    char (*loteria)[25];
     char codigoContenedor[25];
 
     arch = fopen(ruta, "wt");
@@ -127,8 +125,8 @@ int generarEscenario(const char* ruta, const tConfiguracion* config)
 
     maxContenedores = config->maximoBuques * config->maximoContenedoresPorBuque;
 
-    bolillero = malloc(maxContenedores * sizeof(char[25]));
-    if (!bolillero)
+    loteria = malloc(maxContenedores * sizeof(char[25]));
+    if (!loteria)
     {
         fclose(arch);
         return SIN_MEM;
@@ -151,7 +149,7 @@ int generarEscenario(const char* ruta, const tConfiguracion* config)
             if (j > 1) strcat(buque.manifiesto, ",");
             strcat(buque.manifiesto, codigoContenedor);
 
-            strcpy(bolillero[totalContenedores], codigoContenedor);
+            strcpy(*(loteria+totalContenedores), codigoContenedor);
             totalContenedores++;
         }
 
@@ -166,9 +164,9 @@ int generarEscenario(const char* ruta, const tConfiguracion* config)
         sprintf(camion.id, "K%03d", i + 1);
 
         indiceAleatorio = rand() % totalContenedores;
-        strcpy(camion.contenedor, bolillero[indiceAleatorio]);
+        strcpy(camion.contenedor, *(loteria+indiceAleatorio));
 
-        strcpy(bolillero[indiceAleatorio], bolillero[totalContenedores - 1]);
+        strcpy(*(loteria+indiceAleatorio), *(loteria+totalContenedores - 1));
         totalContenedores--;
 
         ponerEnOrden(&listaCamiones, &camion, sizeof(tCamionGen), cmpCamionesGen, NULL);
@@ -180,6 +178,7 @@ int generarEscenario(const char* ruta, const tConfiguracion* config)
     fprintf(arch, "CAPACIDAD_PILA:%d\n\n", config->capacidadPila);
 
     fprintf(arch, "[BUQUES]\n");
+
     while (sacarPrimeroLista(&listaBuques, &buque, sizeof(tBuqueGen)) == EXITO)
     {
         fprintf(arch, "%s;T=%d;C=%s\n", buque.id, buque.tArribo, buque.manifiesto);
@@ -191,7 +190,7 @@ int generarEscenario(const char* ruta, const tConfiguracion* config)
         fprintf(arch, "%s;T=%d;C=%s\n", camion.id, camion.tArribo, camion.contenedor);
     }
 
-    free(bolillero);
+    free(loteria);
     fclose(arch);
 
     return EXITO;

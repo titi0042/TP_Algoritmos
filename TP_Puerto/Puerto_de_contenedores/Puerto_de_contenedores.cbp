@@ -43,6 +43,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="cola.h" />
+		<Unit filename="comunes.h" />
 		<Unit filename="lista.c">
 			<Option compilerVar="CC" />
 		</Unit>
