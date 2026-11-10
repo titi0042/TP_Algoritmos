@@ -14,30 +14,35 @@
 #define SIM_FIN_BLOQUEO 12
 #define SIM_FIN_TIEMPO  13
 
-typedef struct {
+typedef struct
+{
     char codigo[25];
 } tContenedor;
 
-typedef struct {
+typedef struct
+{
     char id[25];
     int tArribo;
     tCola contenedores; // Cola FIFO con el manifiesto de carga del buque
 } tBuque;
 
-typedef struct {
+typedef struct
+{
     char id[25];
     int tArribo;
     char contenedorPedido[25];
 } tCamion;
 
 
-typedef struct {
+typedef struct
+{
     int idMuelle;
     int ocupado;        // 0 = Libre, 1 = Ocupado
     tBuque buqueActual;
 } tMuelle;
 
-typedef struct {
+typedef struct
+{
     int idZona;
     int cantidadActual;
     int capacidadMaxima;
@@ -45,7 +50,8 @@ typedef struct {
 } tZona;
 
 
-typedef struct {
+typedef struct
+{
     int relojActual;
 
     int duracionJornada;
@@ -75,7 +81,7 @@ void mostrarResumenFinal(tPuerto* puerto);
 int liberarPuerto(tPuerto* puerto);
 
 void ejecutarDES(tPuerto* puerto, char* idMuelle, char* idZona);
-void ejecutarREU(tPuerto* puerto, char* idZonaOrigen, char* idZonaDest);
+void ejecutarREU(tPuerto* puerto, char* idZonaOrigen, char* idZonaDestino);
 void ejecutarENT(tPuerto* puerto);
 void ejecutarVER(tPuerto* puerto);
 void ejecutarESP(tPuerto* puerto);

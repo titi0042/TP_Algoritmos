@@ -17,6 +17,9 @@ typedef tNodoLista* tLista;
 /// CALLBACKS
 
 typedef int (*tCmp)(const void*, const void*);
+typedef int (*tAccion)(void* info, const void* parametro);
+
+
 typedef int (*tAcumular)(void**, unsigned*, const void*, unsigned);
 typedef void (*tMostrarArchivo)(const void*, FILE*);
 
@@ -38,6 +41,16 @@ int ponerEnOrden(tLista* lista, const void* d, unsigned cantBytes, tCmp Comparar
 int sacarPrimeroLista(tLista* p, void* d, unsigned cantBytes);
 int sacarUltimoLista(tLista* p, void* d, unsigned cantBytes);
 
+int sacarPosLista(tLista *p, void *info, unsigned tamInfo, unsigned pos);
+
+
+
+int busqClaveLista(tLista *p, tCmp comparar, void* clave);
+
+
+int sacarClaveLista(tLista* p, void* d, unsigned cantBytes, tCmp comparar);
+
+
 int verPrimeroLista(const tLista* p, void* d, unsigned cantBytes);
 int verUltimoLista(const tLista* p, void* d, unsigned cantBytes);
 
@@ -47,4 +60,7 @@ int mostrarListaAlRevesYVaciar(tLista* p, tMostrarArchivo Mostrar, FILE* fp);
 
 void ordenarLista(tLista* p, tCmp Comparar);
 
+
+
+void mapLista(tLista* p, tAccion accion, void* parametro);
 #endif // LISTA_H_INCLUDED

@@ -250,3 +250,84 @@ int mostrarListaAlRevesYVaciar(tLista* p, void (*Mostrar)(const void*, FILE*), F
     }
     return EXITO;
 }
+
+
+int sacarClaveLista(tLista* p, void* d, unsigned cantBytes, tCmp comparar)
+{
+    tNodoLista* aux;
+    if(!*p)
+        return LISTA_VACIA;
+
+    while(*p && comparar((*p)->info, d)<0)
+        p=&(*p)->sig;
+
+    if(*p && comparar((*p)->info, d)==0)
+    {
+        memcpy(d,(*p)->info,cantBytes);
+        aux=*p;
+        *p=aux->sig;
+        free(aux->info);
+        free(aux);
+
+        return EXITO;
+    }
+    return NO_ENCONTRADO;
+}
+
+
+int busqClaveLista(tLista *p, tCmp comparar, void* clave)
+{
+
+    int pos = 0;
+
+    while(*p)
+    {
+        if(comparar((*p)->info, clave) == 0)
+        {
+            return pos;
+        }
+        p = &(*p)->sig;
+        pos++;
+    }
+
+    return NO_ENCONTRADO;
+}
+
+
+
+int sacarPosLista(tLista *p, void *info, unsigned tamInfo, unsigned pos)
+{
+    tNodoLista *aux;
+
+    while(*p && pos)
+    {
+        p = &(*p)->sig;
+        pos--;
+    }
+
+    if(!*p || pos)
+        return NO_ENCONTRADO;
+
+
+    aux = *p;
+    *p = aux->sig;
+
+    memcpy(info, aux->info, MINIMO(tamInfo, aux->tamInfo));
+
+    free(aux->info);
+    free(aux);
+    return EXITO;
+}
+
+
+void mapLista(tLista* p, tAccion accion, void* parametro)
+{
+    if(!accion)
+        return;
+
+    while(*p)
+    {
+        accion((*p)->info,parametro);
+        p = &(*p)->sig;
+    }
+}
