@@ -6,7 +6,7 @@
 
 void pausarPantalla(void)
 {
-//    printf("\nPresione ENTER para continuar...");
+    printf("\nPresione ENTER para continuar...");
     while (getchar() != '\n');
 }
 
@@ -104,12 +104,19 @@ void mostrarTresCamiones(tCola* colaCamiones, int tiempoActual)
 
     verPrimeroCola(colaCamiones, &camion, sizeof(tCamion));
 
+    if (verPrimeroCola(colaCamiones, &camion, sizeof(tCamion)) == COLA_VACIA)
+    {
+        printf("No llegaron camiones\n");
+        vaciarCola(&colaAux);
+        return;
+    }
     if(camion.tArribo>tiempoActual)
     {
         printf("No llegaron camiones\n");
         vaciarCola(&colaAux);
         return;
     }
+
 
     while(sacarDeCola(colaCamiones,&camion,sizeof(tCamion))==EXITO)
     {
@@ -127,7 +134,7 @@ void mostrarTresCamiones(tCola* colaCamiones, int tiempoActual)
                 }
 
                 printf("%s(%s)", camion.id, camion.contenedorPedido);
-                 i++;
+                i++;
 
             }
 
@@ -147,6 +154,8 @@ void mostrarTresCamiones(tCola* colaCamiones, int tiempoActual)
     vaciarCola(&colaAux);
 
 }
+
+
 void mostrarBuqueAtracado(void* info, void* parametro)
 {
     tMuelle* muelle=(tMuelle*)info;
@@ -594,9 +603,9 @@ int ejecutarSimulacion(tPuerto* puerto)
     {
         estadoSimulacion = actualizarEstadoPuerto(puerto);
 
-        pausarPantalla();
-
-        system("cls");
+//        pausarPantalla();
+//
+//        system("cls");
 
         if (estadoSimulacion == SIM_EN_CURSO)
         {
@@ -882,7 +891,8 @@ void ejecutarENT(tPuerto* puerto)
     int tIni = puerto->relojActual;
     char zonaOrigen[15];
 
-    if(verPrimeroCola(&puerto->colaCamiones,&camionAuxiliar,sizeof(tCamion))==COLA_VACIA || camionAuxiliar.tArribo<=puerto->relojActual)
+
+    if (verPrimeroCola(&puerto->colaCamiones, &camionAuxiliar, sizeof(tCamion)) == COLA_VACIA || camionAuxiliar.tArribo > puerto->relojActual)
     {
         printf("No hay camiones\n");
         return;
@@ -924,7 +934,7 @@ void ejecutarENT(tPuerto* puerto)
 void ejecutarVER(tPuerto* puerto)
 {
     puts("");
-    
+
     int puntuacion=0, cantidadCamiones;
     printf("Tiempo Actual: %d\n",puerto->relojActual);
     mapLista(&(puerto->muelles),mostrarBuqueAtracado,NULL);

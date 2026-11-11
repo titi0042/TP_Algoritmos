@@ -84,8 +84,13 @@ int cargarConfiguracion(const char* ruta, tConfiguracion* config)
 
     while (fgets(linea, sizeof(linea), arch))
     {
-        if (sscanf(linea, "%s: %d", clave, &valor) == 2)
+        if (sscanf(linea, "%[^:]: %d", clave, &valor) == 2)
         {
+            if(valor<0)
+            {
+                printf("Configuracion invalida\n");
+                return ERR_ARCH;
+            }
             if (strcmp(clave, "duracion_jornada_minutos") == 0)
                 config->duracionJornadaMinutos = valor;
             else if (strcmp(clave, "cantidad_muelles") == 0)
