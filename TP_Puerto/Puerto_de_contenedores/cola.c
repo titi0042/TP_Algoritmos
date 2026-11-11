@@ -70,12 +70,15 @@ int verPrimeroCola(const tCola* p, void* d, unsigned cantBytes)
 void vaciarCola(tCola* p)
 {
     tNodoCola *aux;
+
     while(p->prim)
     {
         aux = p->prim;
         p->prim = aux->sig;
         free(aux->info);
         free(aux);
+
     }
     p->ult = NULL;
+
 }

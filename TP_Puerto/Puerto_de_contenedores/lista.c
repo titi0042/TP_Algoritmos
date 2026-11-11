@@ -320,7 +320,7 @@ int sacarPosLista(tLista *p, void *info, unsigned tamInfo, unsigned pos)
 }
 
 
-void mapLista(tLista* p, tAccion accion, void* parametro)
+void mapLista(tLista* p, tAccionLista accion, void* parametro)
 {
     if(!accion)
         return;

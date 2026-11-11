@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "comunes.h"
+#include "simulacion.h"
 #include "archivos.h"
 
 int main()
 {
     tConfiguracion config;
+    tPuerto puerto;
     int estado;
 
     printf("Iniciando simulacion\n");
@@ -25,6 +27,14 @@ int main()
     }
     printf("puerto.txt generado exitosamente\n");
 
+
+    inicializarPuerto(&puerto, "puerto.txt", &config);
+
+    ejecutarSimulacion(&puerto);
+
+    mostrarResumenFinal(&puerto);
+
+    liberarPuerto(&puerto);
 
 
     return EXITO;

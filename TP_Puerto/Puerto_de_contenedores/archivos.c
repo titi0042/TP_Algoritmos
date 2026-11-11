@@ -20,7 +20,16 @@ typedef struct
     char contenedor[25];
 } tCamionGen;
 
+void limpiarSaltoLinea(char* cadena)
+{
+    char* ptr = cadena;
 
+    while (*ptr != '\0' && *ptr != '\n' && *ptr != '\r')
+    {
+        ptr++;
+    }
+    *ptr = '\0';
+}
 
 int cmpBuquesGen(const void* a, const void* b)
 {

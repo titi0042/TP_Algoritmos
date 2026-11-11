@@ -2,12 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "pila.h"
-#include "cola.h"
-#include "lista.h"
 #include "simulacion.h"
 
-void mostrarBuqesEspera(tCola* colaBuqes, int tiempoActual)
+void mostrarBuquesEspera(tCola* colaBuqes, int tiempoActual)
 {
     tCola colaAux;
     int i=0;
@@ -27,16 +24,30 @@ void mostrarBuqesEspera(tCola* colaBuqes, int tiempoActual)
         ponerEnCola(colaBuqes,&buque,sizeof(tBuque));
     }
 
-    printf("Buqes en espera: %d\n",i);
+    printf("Buques en espera: %d\n",i);
+
+    vaciarCola(&colaAux);
+
 }
 int mostrarTresCamiones(tCola* colaCamiones, int tiempoActual)
 {
     tCola colaAux;
-    crearCola(&colaAux);
     tCamion camion;
     int i=0;
 
-    printf("Cola camiones:");
+    crearCola(&colaAux);
+
+    printf("Cola camiones: ");
+
+    verPrimeroCola(colaCamiones, &camion, sizeof(tCamion));
+
+    if(camion.tArribo>tiempoActual)
+    {
+        printf("No llegaron camiones\n");
+        vaciarCola(&colaAux);
+        return 0;
+    }
+
     while(sacarDeCola(colaCamiones,&camion,sizeof(tCamion))==EXITO)
     {
         ponerEnCola(&colaAux,&camion,sizeof(tCamion));
@@ -45,22 +56,31 @@ int mostrarTresCamiones(tCola* colaCamiones, int tiempoActual)
     {
         if(camion.tArribo <= tiempoActual)
         {
-
-
-            if(i<3)
+            if (i < 3)
             {
-                printf(" %s(%s)",camion.id,camion.contenedorPedido);
-                if(!colaVacia(&colaAux))
-                    printf( "->");
-                else
-                    printf("\n");
+                if (i > 0)
+                {
+                    printf(" -> ");
+                }
+
+                printf("%s(%s)", camion.id, camion.contenedorPedido);
 
             }
             i++;
-
         }
         ponerEnCola(colaCamiones,&camion,sizeof(tCamion));
     }
+
+    if (i > 0)
+    {
+        printf("\n");
+    }
+    else
+    {
+        printf(" vacia\n");
+    }
+
+    vaciarCola(&colaAux);
 
     return i;
 
@@ -83,25 +103,27 @@ int mostrarBuqueAtracado(void* info, const void* parametro)
 int mostrarContenedorZona(void* info, const void* parametro)
 {
     tZona* zona=(tZona*)info;
-    tPila auxiliarPila;
+    tPila pilaAux;
     tContenedor contenedor;
-    crearPila(&auxiliarPila);
+    crearPila(&pilaAux);
 
     printf("Z%d:[",zona->idZona);
     while(sacarDePila(&(zona->pilaContenedores),&contenedor,sizeof(tContenedor))==EXITO)
     {
-        printf("C%s",contenedor.codigo);
-        if(!pilaVacia(&auxiliarPila))
+        printf("%s",contenedor.codigo);
+        if(!pilaVacia(&(zona->pilaContenedores)))
             printf("|");
-        ponerEnPila(&auxiliarPila,&contenedor,sizeof(tContenedor));
+        ponerEnPila(&pilaAux,&contenedor,sizeof(tContenedor));
     }
 
     printf("]\t");
 
-    while(sacarDePila(&auxiliarPila,&contenedor,sizeof(tContenedor))==EXITO)
+    while(sacarDePila(&pilaAux,&contenedor,sizeof(tContenedor))==EXITO)
     {
         ponerEnPila(&(zona->pilaContenedores),&contenedor,sizeof(tContenedor));
     }
+
+    vaciarPila(&pilaAux);
 
     return EXITO;
 
@@ -148,18 +170,6 @@ int compararZona(const void* a, const void* b)
     tZona* aux2=(tZona*)b;
 
     return aux1->idZona-aux2->idZona;
-}
-
-
-void limpiarSaltoLinea(char* cadena)
-{
-    char* ptr = cadena;
-
-    while (*ptr != '\0' && *ptr != '\n' && *ptr != '\r')
-    {
-        ptr++;
-    }
-    *ptr = '\0';
 }
 
 int inicializarPuerto(tPuerto* puerto, const char* rutaEscenario, const tConfiguracion* config)
@@ -311,7 +321,6 @@ int inicializarPuerto(tPuerto* puerto, const char* rutaEscenario, const tConfigu
     fclose(arch);
     return EXITO;
 }
-
 int evaluarOperacionesValidas(tPuerto* puerto)
 {
     int puedeDES = 0, puedeREU = 0, puedeENT = 0;
@@ -319,6 +328,12 @@ int evaluarOperacionesValidas(tPuerto* puerto)
     int zonaConEspacio = 0;
     int zonaNoVacia = 0;
     int topeCoincide = 0;
+    int i, j;
+
+    tMuelle muelleAux;
+    tZona zonaAux, zonaDestAux;
+    tCamion camionFrente;
+    tContenedor contTope;
 
     /// muelleConCarga && zonaConEspacio = Puede DES
     /// zonaConEspacio && zonaNoVacia = Puede DES y REU
@@ -327,40 +342,34 @@ int evaluarOperacionesValidas(tPuerto* puerto)
     /// !zonaConEspacio && !zonaNoVacia = Caso no posible
     /// topeCoincide = Puede ENT
 
-    tNodoLista* nMuelle = puerto->muelles;
-    tNodoLista* nZona;
-    tMuelle* muelle;
-    tZona* zona;
-    tCamion camionFrente;
-    tContenedor contTope;
-
-
-    while (nMuelle != NULL && muelleConCarga == 0)
+    for (i = 1; i <= puerto->cantidadMuelles; i++)
     {
-        muelle = (tMuelle*)(nMuelle->info);
-        if (muelle->ocupado == 1)
+        muelleAux.idMuelle = i;
+
+        if (sacarClaveLista(&(puerto->muelles), &muelleAux, sizeof(tMuelle), compararMuelle) == EXITO)
         {
-            if (colaVacia(&(muelle->buqueActual.contenedores)) == 0)
+            if (muelleAux.ocupado == 1 && colaVacia(&(muelleAux.buqueActual.contenedores)) == 0)
             {
                 muelleConCarga = 1;
             }
+            ponerEnOrden(&(puerto->muelles), &muelleAux, sizeof(tMuelle), compararMuelle, NULL);
         }
-        nMuelle = nMuelle->sig;
+
     }
 
-    nZona = puerto->zonas;
-    while (nZona != NULL)
+
+    for (i = 1; i <= puerto->cantidadZonas; i++)
     {
-        zona = (tZona*)(nZona->info);
-        if (zona->cantidadActual < zona->capacidadMaxima)
+        zonaAux.idZona = i;
+        if (sacarClaveLista(&(puerto->zonas), &zonaAux, sizeof(tZona), compararZona) == EXITO)
         {
-            zonaConEspacio = 1;
+            if (zonaAux.cantidadActual < zonaAux.capacidadMaxima)
+                zonaConEspacio = 1;
+            if (zonaAux.cantidadActual > 0)
+                zonaNoVacia = 1;
+
+            ponerEnOrden(&(puerto->zonas), &zonaAux, sizeof(tZona), compararZona, NULL);
         }
-        if (zona->cantidadActual > 0)
-        {
-            zonaNoVacia = 1;
-        }
-        nZona = nZona->sig;
     }
 
     if (muelleConCarga && zonaConEspacio)
@@ -368,50 +377,62 @@ int evaluarOperacionesValidas(tPuerto* puerto)
         puedeDES = 1;
     }
 
+
     if (zonaNoVacia && zonaConEspacio)
     {
-        nZona = puerto->zonas;
-        while (nZona != NULL && puedeREU == 0)
+        for (i = 1; i <= puerto->cantidadZonas && puedeREU == 0; i++)
         {
-            zona = (tZona*)(nZona->info);
-            if (zona->cantidadActual > 0)
+            zonaAux.idZona = i;
+            if (sacarClaveLista(&(puerto->zonas), &zonaAux, sizeof(tZona), compararZona) == EXITO)
             {
-                tNodoLista* nZonaDest = puerto->zonas;
-                while (nZonaDest != NULL && puedeREU == 0)
+                if (zonaAux.cantidadActual > 0)
                 {
-                    tZona* zonaDest = (tZona*)(nZonaDest->info);
-                    if (zonaDest->idZona != zona->idZona && zonaDest->cantidadActual < zonaDest->capacidadMaxima)
+                    for (j = 1; j <= puerto->cantidadZonas && puedeREU == 0; j++)
                     {
-                        puedeREU = 1;
+                        if (i != j)
+                        {
+                            zonaDestAux.idZona = j;
+                            if (sacarClaveLista(&(puerto->zonas), &zonaDestAux, sizeof(tZona), compararZona) == EXITO)
+                            {
+                                if (zonaDestAux.cantidadActual < zonaDestAux.capacidadMaxima)
+                                {
+                                    puedeREU = 1;
+                                }
+                                ponerEnOrden(&(puerto->zonas), &zonaDestAux, sizeof(tZona), compararZona, NULL);
+                            }
+                        }
                     }
-                    nZonaDest = nZonaDest->sig;
                 }
+                ponerEnOrden(&(puerto->zonas), &zonaAux, sizeof(tZona), compararZona, NULL);
             }
-            nZona = nZona->sig;
         }
     }
+
 
     if (verPrimeroCola(&(puerto->colaCamiones), &camionFrente, sizeof(tCamion)) == EXITO)
     {
         if (camionFrente.tArribo <= puerto->relojActual)
         {
-            nZona = puerto->zonas;
-            while (nZona != NULL && topeCoincide == 0)
+            for (i = 1; i <= puerto->cantidadZonas && topeCoincide == 0; i++)
             {
-                zona = (tZona*)(nZona->info);
-                if (zona->cantidadActual > 0)
+                zonaAux.idZona = i;
+                if (sacarClaveLista(&(puerto->zonas), &zonaAux, sizeof(tZona), compararZona) == EXITO)
                 {
-                    if (verTope(&(zona->pilaContenedores), &contTope, sizeof(tContenedor)) == EXITO)
+                    if (zonaAux.cantidadActual > 0)
                     {
-                        if (strcmp(contTope.codigo, camionFrente.contenedorPedido) == 0)
+                        if (verTope(&(zonaAux.pilaContenedores), &contTope, sizeof(tContenedor)) == EXITO)
                         {
-                            topeCoincide = 1;
+                            if (strcmp(contTope.codigo, camionFrente.contenedorPedido) == 0)
+                            {
+                                topeCoincide = 1;
+                            }
                         }
                     }
+                    ponerEnOrden(&(puerto->zonas), &zonaAux, sizeof(tZona), compararZona, NULL);
                 }
-                nZona = nZona->sig;
             }
-            if (topeCoincide) puedeENT = 1;
+            if (topeCoincide)
+                puedeENT = 1;
         }
     }
 
@@ -421,15 +442,13 @@ int evaluarOperacionesValidas(tPuerto* puerto)
     }
     return NO_OP_VALIDAS;
 }
-
 int actualizarEstadoPuerto(tPuerto* puerto)
 {
-    tNodoLista* nMuelle;
-    tMuelle* muelle;
+    int i;
+    tMuelle muelleAux;
     tBuque buqueFrente;
     tCamion camionFrente;
 
-    int operacionesValidas = 0;
     int minEventoFuturo = 999999;
     int finNormal = 1;
 
@@ -438,50 +457,55 @@ int actualizarEstadoPuerto(tPuerto* puerto)
         return SIM_FIN_TIEMPO;
     }
 
-    /// Liberar Muelles sin carga
-    nMuelle = puerto->muelles;
-    while (nMuelle != NULL)
+    for (i = 1; i <= puerto->cantidadMuelles; i++)
     {
-        muelle = (tMuelle*)(nMuelle->info);
-        if (muelle->ocupado == 1)
+        muelleAux.idMuelle = i;
+        if (sacarClaveLista(&(puerto->muelles), &muelleAux, sizeof(tMuelle), compararMuelle) == EXITO)
         {
-            if (colaVacia(&(muelle->buqueActual.contenedores)) != 0)
+            if (muelleAux.ocupado == 1)
             {
-                muelle->ocupado = 0;
-                puerto->buquesDescargados++;
+                if (colaVacia(&(muelleAux.buqueActual.contenedores)) != 0)
+                {
+                    muelleAux.ocupado = 0;
+                    puerto->buquesDescargados++;
+                }
+                else
+                {
+                    finNormal = 0;
+                }
             }
-            else
-            {
-                finNormal = 0;
-            }
+            ponerEnOrden(&(puerto->muelles), &muelleAux, sizeof(tMuelle), compararMuelle, NULL);
         }
-        nMuelle = nMuelle->sig;
     }
 
-    /// Asignacion automatico de buques
-    nMuelle = puerto->muelles;
-    while (nMuelle != NULL)
-    {
-        muelle = (tMuelle*)(nMuelle->info);
-        if (muelle->ocupado == 0)
-        {
-            if (verPrimeroCola(&(puerto->colaBuques), &buqueFrente, sizeof(tBuque)) == EXITO)
-            {
-                if (buqueFrente.tArribo <= puerto->relojActual)
-                {
-                    sacarDeCola(&(puerto->colaBuques), &buqueFrente, sizeof(tBuque));
-                    muelle->buqueActual = buqueFrente;
-                    muelle->ocupado = 1;
 
-                    if (colaVacia(&(muelle->buqueActual.contenedores)) == 0)
+    for (i = 1; i <= puerto->cantidadMuelles; i++)
+    {
+        muelleAux.idMuelle = i;
+        if (sacarClaveLista(&(puerto->muelles), &muelleAux, sizeof(tMuelle), compararMuelle) == EXITO)
+        {
+            if (muelleAux.ocupado == 0)
+            {
+                if (verPrimeroCola(&(puerto->colaBuques), &buqueFrente, sizeof(tBuque)) == EXITO)
+                {
+                    if (buqueFrente.tArribo <= puerto->relojActual)
                     {
-                        finNormal = 0;
+                        sacarDeCola(&(puerto->colaBuques), &buqueFrente, sizeof(tBuque));
+                        muelleAux.buqueActual = buqueFrente;
+                        muelleAux.ocupado = 1;
                     }
                 }
             }
+
+            if (muelleAux.ocupado == 1 && colaVacia(&(muelleAux.buqueActual.contenedores)) == 0)
+            {
+                finNormal = 0;
+            }
+
+            ponerEnOrden(&(puerto->muelles), &muelleAux, sizeof(tMuelle), compararMuelle, NULL);
         }
-        nMuelle = nMuelle->sig;
     }
+
 
     if (verPrimeroCola(&(puerto->colaBuques), &buqueFrente, sizeof(tBuque)) == EXITO)
     {
@@ -491,7 +515,6 @@ int actualizarEstadoPuerto(tPuerto* puerto)
             minEventoFuturo = buqueFrente.tArribo;
         }
     }
-
 
     if (verPrimeroCola(&(puerto->colaCamiones), &camionFrente, sizeof(tCamion)) == EXITO)
     {
@@ -507,7 +530,7 @@ int actualizarEstadoPuerto(tPuerto* puerto)
         return SIM_FIN_NORMAL;
     }
 
-    operacionesValidas = evaluarOperacionesValidas(puerto);
+    int operacionesValidas = evaluarOperacionesValidas(puerto);
     if (operacionesValidas == NO_OP_VALIDAS)
     {
         if (minEventoFuturo != 999999 && minEventoFuturo <= puerto->duracionJornada)
@@ -523,6 +546,7 @@ int actualizarEstadoPuerto(tPuerto* puerto)
 
     return SIM_EN_CURSO;
 }
+
 
 void ejecutarSimulacion(tPuerto* puerto)
 {
@@ -572,6 +596,10 @@ void ejecutarSimulacion(tPuerto* puerto)
                     {
                         ejecutarESP(puerto);
                     }
+                    else if (strcmp(tokenCmd, "FIN") == 0)
+                    {
+                        estadoSimulacion = SIM_FIN_FORZADO;
+                    }
                     else
                     {
                         printf("Comando rechazado: Invalido.\n");
@@ -593,6 +621,45 @@ void ejecutarSimulacion(tPuerto* puerto)
     {
         printf("\n--- JORNADA FINALIZADA POR TIEMPO ---\n");
     }
+    else if (estadoSimulacion == SIM_FIN_FORZADO)
+    {
+        printf("\n--- JORNADA FINALIZADA FORZOSAMENTE ---\n");
+    }
+}
+
+void mostrarResumenFinal(tPuerto* puerto)
+{
+    tCamion camion;
+    tCola colaAux;
+    int cant=0, puntajefinal=0;
+
+    printf("RESUMEN DE LA SIMULACION:\n");
+    printf("%d min de %d\n",puerto->relojActual,puerto->duracionJornada);
+    printf("Buques descargados: %d -> %d puntos\n",puerto->buquesDescargados,puerto->buquesDescargados*PUNTAJE_BUQUE);
+    printf("Contenedores entregados: %d -> %d puntos\n",puerto->contenedoresEntregados,puerto->contenedoresEntregados*PUNTAJE_ENTREGA);
+    printf("Reorganizaciones: %d\n",puerto->reubicacionesRealizadas);
+
+    crearCola(&colaAux);
+
+    while(sacarDeCola(&(puerto->colaCamiones),&camion,sizeof(tCamion))==EXITO)
+    {
+        ponerEnCola(&colaAux,&camion,sizeof(tCamion));
+    }
+    while(sacarDeCola(&colaAux,&camion,sizeof(tCamion))==EXITO)
+    {
+        if(camion.tArribo <= puerto->relojActual)
+        {
+            cant++;
+        }
+        ponerEnCola(&(puerto->colaCamiones),&camion,sizeof(tCamion));
+    }
+    printf("Camiones pendientes: %d -> %d puntos de penalizacion\n",cant, cant*PENALIZACION_CAMION);
+
+    puntajefinal=puerto->buquesDescargados*PUNTAJE_BUQUE+puerto->contenedoresEntregados*PUNTAJE_ENTREGA-cant*PENALIZACION_CAMION;
+
+    printf("Puntaje Final: %d\n",puntajefinal);
+
+    vaciarCola(&colaAux);
 }
 
 int liberarPuerto(tPuerto* puerto)
@@ -635,13 +702,17 @@ void ejecutarDES(tPuerto* puerto, char* idMuelle, char* idZona)
     tMuelle muelleAux;
     tZona zonaAux;
     tContenedor auxContenedor;
+
     if (!idMuelle || !idZona)
     {
         printf("Rechazado: Faltan parametros (DES <muelle> <zona>).\n");
         return;
     }
-    zonaAux.idZona=atoi(idZona);
-    muelleAux.idMuelle=atoi(idMuelle);
+
+
+    sscanf(idZona,"Z%d",&(zonaAux.idZona));
+    sscanf(idMuelle,"M%d",&(muelleAux.idMuelle));
+
 
     if(sacarClaveLista(&(puerto->muelles),&muelleAux,sizeof(tMuelle), compararMuelle)!= EXITO)
     {
@@ -655,18 +726,31 @@ void ejecutarDES(tPuerto* puerto, char* idMuelle, char* idZona)
         printf("No se encontro  zona: [%s] \n",idZona);
         return;
 
-
     }
-    if(!colaVacia(&(muelleAux.buqueActual.contenedores)) && zonaAux.cantidadActual<zonaAux.capacidadMaxima)
+    if(muelleAux.ocupado==1)
     {
-        sacarDeCola(&(muelleAux.buqueActual.contenedores),&auxContenedor,sizeof(tContenedor));
-        ponerEnPila(&(zonaAux.pilaContenedores),&auxContenedor,sizeof(tContenedor));
-        zonaAux.cantidadActual++;
+        if(!colaVacia(&(muelleAux.buqueActual.contenedores)) )
+        {
 
-        puerto->relojActual+=puerto->tiempoDescarga;
+            if(zonaAux.cantidadActual<zonaAux.capacidadMaxima)
+            {
+                sacarDeCola(&(muelleAux.buqueActual.contenedores),&auxContenedor,sizeof(tContenedor));
+                ponerEnPila(&(zonaAux.pilaContenedores),&auxContenedor,sizeof(tContenedor));
+                zonaAux.cantidadActual++;
+
+                puerto->relojActual+=puerto->tiempoDescarga;
+            }
+            else
+                printf("Z%d esta llena\n",zonaAux.idZona);
+
+        }
+        else
+            printf("Buque atracado en M%d vacio\n",muelleAux.idMuelle);
+
     }
     else
-        printf("No se pudo descargar\n");
+        printf("M%d desocupado\n",muelleAux.idMuelle);
+
     ponerEnOrden(&(puerto->muelles),&muelleAux,sizeof(tMuelle),compararMuelle,NULL);
     ponerEnOrden(&(puerto->zonas),&zonaAux,sizeof(tZona),compararZona,NULL);
 
@@ -686,8 +770,9 @@ void ejecutarREU(tPuerto* puerto, char* idZonaOrigen, char* idZonaDestino)
         return;
     }
 
-    zonaOrigen.idZona=atoi(idZonaOrigen);
-    zonaDestino.idZona=atoi(idZonaDestino);
+    sscanf(idZonaOrigen,"Z%d",&(zonaOrigen.idZona));
+    sscanf(idZonaDestino,"Z%d",&(zonaDestino.idZona));
+
 
     if( sacarClaveLista(&(puerto->zonas),&zonaOrigen,sizeof(tZona), compararZona) != EXITO)
     {
@@ -702,22 +787,28 @@ void ejecutarREU(tPuerto* puerto, char* idZonaOrigen, char* idZonaDestino)
         return;
     }
 
-    if(zonaOrigen.cantidadActual > 0 && zonaDestino.cantidadActual<zonaDestino.capacidadMaxima)
+    if(zonaOrigen.cantidadActual > 0)
     {
+        if(zonaDestino.cantidadActual<zonaDestino.capacidadMaxima)
+        {
+            sacarDePila(&zonaOrigen.pilaContenedores,&auxContenedor,sizeof(tContenedor));
+            zonaOrigen.cantidadActual--;
 
-        sacarDePila(&zonaOrigen.pilaContenedores,&auxContenedor,sizeof(tContenedor));
-        zonaOrigen.cantidadActual--;
-
-        ponerEnPila(&(zonaDestino.pilaContenedores),&auxContenedor,sizeof(tContenedor));
-        zonaDestino.cantidadActual++;
+            ponerEnPila(&(zonaDestino.pilaContenedores),&auxContenedor,sizeof(tContenedor));
+            zonaDestino.cantidadActual++;
 
 
 
-    puerto->relojActual+=puerto->tiempoReubicacion;
-    puerto->reubicacionesRealizadas++;
+            puerto->relojActual+=puerto->tiempoReubicacion;
+            puerto->reubicacionesRealizadas++;
+        }
+        else
+            printf("Rechazado: Z%d destino llena",zonaDestino.idZona);
+
+
     }
     else
-        printf("Rechazado: El buque esta vacio o la zona esta llena.\n");
+        printf("Rechazado: Z%d origen vacia",zonaOrigen.idZona);
 
     ponerEnOrden(&(puerto->zonas),&zonaOrigen,sizeof(tZona),compararZona,NULL);
     ponerEnOrden(&(puerto->zonas),&zonaDestino,sizeof(tZona),compararZona,NULL);
@@ -762,7 +853,7 @@ void ejecutarVER(tPuerto* puerto)
     mapLista(&(puerto->zonas),mostrarContenedorZona,NULL);
     puts("");
     cantidadCamiones = mostrarTresCamiones(&(puerto->colaCamiones), puerto->relojActual);
-    mostrarBuqesEspera(&(puerto->colaBuques), puerto->relojActual);
+    mostrarBuquesEspera(&(puerto->colaBuques), puerto->relojActual);
     puntuacion=puerto->buquesDescargados*PUNTAJE_BUQUE+puerto->contenedoresEntregados*PUNTAJE_ENTREGA-cantidadCamiones*PENALIZACION_CAMION;
     printf("Puntaje Actual: %d",puntuacion);
 

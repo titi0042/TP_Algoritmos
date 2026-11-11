@@ -17,7 +17,7 @@ typedef tNodoLista* tLista;
 /// CALLBACKS
 
 typedef int (*tCmp)(const void*, const void*);
-typedef int (*tAccion)(void* info, const void* parametro);
+typedef int (*tAccionLista)(void* info, const void* parametro);
 
 
 typedef int (*tAcumular)(void**, unsigned*, const void*, unsigned);
@@ -62,5 +62,5 @@ void ordenarLista(tLista* p, tCmp Comparar);
 
 
 
-void mapLista(tLista* p, tAccion accion, void* parametro);
+void mapLista(tLista* p, tAccionLista accion, void* parametro);
 #endif // LISTA_H_INCLUDED

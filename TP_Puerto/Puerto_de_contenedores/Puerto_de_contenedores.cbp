@@ -31,6 +31,13 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="Interfaz/menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Registros/registros.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Registros/registros.h" />
 		<Unit filename="arbol.c">
 			<Option compilerVar="CC" />
 		</Unit>

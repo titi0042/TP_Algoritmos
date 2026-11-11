@@ -16,6 +16,7 @@ typedef struct {
     int tiempoCargaCamion;
 } tConfiguracion;
 
+void limpiarSaltoLinea(char* cadena);
 int cargarConfiguracion(const char* ruta, tConfiguracion* config);
 int generarEscenario(const char* ruta, const tConfiguracion* config);
 

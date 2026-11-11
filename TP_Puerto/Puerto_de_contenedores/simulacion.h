@@ -1,6 +1,7 @@
 #ifndef TIPOS_H_INCLUDED
 #define TIPOS_H_INCLUDED
 
+
 #include "comunes.h"
 #include "archivos.h"
 #include "cola.h"
@@ -13,6 +14,7 @@
 #define SIM_FIN_NORMAL  11
 #define SIM_FIN_BLOQUEO 12
 #define SIM_FIN_TIEMPO  13
+#define SIM_FIN_FORZADO  14
 
 typedef struct
 {
