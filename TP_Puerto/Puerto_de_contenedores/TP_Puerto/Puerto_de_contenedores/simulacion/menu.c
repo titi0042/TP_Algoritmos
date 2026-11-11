@@ -81,7 +81,8 @@ int menu()
         switch (opcion)
         {
         case 1:
-            system("cls");
+
+        system("cls");
             if (cargarConfiguracion(ARCHIVO_CONFIG, &config) != EXITO)
             {
                 printf("Error: No se pudo cargar config.txt\n");
