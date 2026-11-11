@@ -603,9 +603,7 @@ int ejecutarSimulacion(tPuerto* puerto)
     {
         estadoSimulacion = actualizarEstadoPuerto(puerto);
 
-//        pausarPantalla();
-//
-//        system("cls");
+
 
         if (estadoSimulacion == SIM_EN_CURSO)
         {
