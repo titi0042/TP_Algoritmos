@@ -923,7 +923,8 @@ void ejecutarENT(tPuerto* puerto)
 
 void ejecutarVER(tPuerto* puerto)
 {
-
+    puts("");
+    
     int puntuacion=0, cantidadCamiones;
     printf("Tiempo Actual: %d\n",puerto->relojActual);
     mapLista(&(puerto->muelles),mostrarBuqueAtracado,NULL);
@@ -936,6 +937,7 @@ void ejecutarVER(tPuerto* puerto)
     puntuacion=puerto->buquesDescargados*PUNTAJE_BUQUE+puerto->contenedoresEntregados*PUNTAJE_ENTREGA-cantidadCamiones*PENALIZACION_CAMION;
     printf("Puntaje Actual: %d",puntuacion);
 
+    puts("");
 }
 
 void ejecutarESP(tPuerto* puerto)
