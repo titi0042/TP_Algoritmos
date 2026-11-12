@@ -3,6 +3,7 @@
 
 #include "../tda/arbol.h"
 #include "../tda/lista.h"
+
 #define ARCHIVO_OPERADORES "operadores.dat"
 #define ARCHIVO_INDICE     "indice_operadores.idx"
 #define ARCHIVO_JORNADAS   "jornadas.dat"
@@ -45,7 +46,7 @@ int cmpIndiceOperador(const void *a, const void *b);
 int cmpOperadorRanking(const void *a, const void *b);
 void accionGuardarIndice(void *info, unsigned tamInfo, unsigned nivel, void *param);
 int guardarIndiceOrdenado(const char *nomArchIndice, const tArbol *arbol);
-int _cargarIndiceBalanceado(tArbol *arbol, FILE *fp, int li, int ls);
+int cargarIndiceBalanceado(tArbol *arbol, FILE *fp, int li, int ls);
 int levantarIndice(const char *nomArchIndice, tArbol *arbol);
 int loginOperador(const char *nombreBuscado, tOperador *operadorActual, long *offsetActual, tArbol *indice);
 int actualizarOperador(tOperador *operadorModificado, long offsetOperador);

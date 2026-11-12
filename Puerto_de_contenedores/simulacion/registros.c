@@ -8,7 +8,6 @@
 
 
 
-
 int cmpIndiceOperador(const void *a, const void *b)
 {
     const tRegIndice *ia = (const tRegIndice *)a;
@@ -62,7 +61,7 @@ int guardarIndiceOrdenado(const char *nomArchIndice, const tArbol *arbol)
     return EXITO;
 }
 
-int _cargarIndiceBalanceado(tArbol *arbol, FILE *fp, int li, int ls)
+int cargarIndiceBalanceado(tArbol *arbol, FILE *fp, int li, int ls)
 {
     int m;
     tRegIndice indAux;
@@ -79,8 +78,8 @@ int _cargarIndiceBalanceado(tArbol *arbol, FILE *fp, int li, int ls)
 
     insArb(arbol, &indAux, sizeof(tRegIndice), cmpIndiceOperador, NULL);
 
-    _cargarIndiceBalanceado(arbol, fp, li, m - 1);
-    _cargarIndiceBalanceado(arbol, fp, m + 1, ls);
+    cargarIndiceBalanceado(arbol, fp, li, m - 1);
+    cargarIndiceBalanceado(arbol, fp, m + 1, ls);
 
     return EXITO;
 }
@@ -107,7 +106,7 @@ int levantarIndice(const char *nomArchIndice, tArbol *arbol)
 
     if (cantRegistros > 0)
     {
-        _cargarIndiceBalanceado(arbol, fp, 0, cantRegistros - 1);
+        cargarIndiceBalanceado(arbol, fp, 0, cantRegistros - 1);
     }
 
     fclose(fp);
