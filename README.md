@@ -19,7 +19,7 @@ Este proyecto es una simulación interactiva desarrollada en lenguaje C que mode
 * **Listas Simplemente Enlazadas:** Manejo dinámico de las zonas de almacenamiento y los muelles.
 * **Árbol Binario de Búsqueda (ABB):** Implementación de un índice persistido en disco para la búsqueda optimizada (logarítmica) y login de los operadores del sistema.
 * **Archivos Genéricos:** Procesamiento de archivos de texto (`config.txt`, `puerto.txt`) y persistencia binaria de jornadas y perfiles de usuario (`operadores.dat`, `indice_operadores.idx`, `jornadas.dat`).
-
+* **Ubicación de Archivos:** Los archivos `config.txt` y `puerto.txt` se encuentra ubicados en la carpeta simulacion.
 ---
 
 
